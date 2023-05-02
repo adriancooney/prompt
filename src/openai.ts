@@ -5,6 +5,11 @@ const DEFAULT_OPEN_AI_PRESENCE_PENALTY = 0;
 const DEFAULT_OPEN_AI_TEMPERATURE = 0.7;
 const DEFAULT_OPEN_AI_TOP_P = 1;
 
+export type ChatCompletionMessage = {
+  role: "user" | "assistant" | "system";
+  content: string;
+};
+
 export type ChatCompletionOptions = {
   apiKey: string;
   frequencyPenalty: number;
@@ -16,29 +21,10 @@ export type ChatCompletionOptions = {
 };
 
 export async function fetchChatCompletion(
-  messages: { role: "user" | "assistant" | "system"; content: string }[],
+  messages: ChatCompletionMessage[],
   options?: Partial<ChatCompletionOptions>
 ): Promise<string> {
-  const fullOptions = getChatCompletionOptions(options);
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${fullOptions.apiKey}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      messages,
-      frequency_penalty: fullOptions.frequencyPenalty,
-      max_tokens: fullOptions.maxTokens,
-      model: fullOptions.model,
-      presence_penalty: fullOptions.presencePenalty,
-      temperature: fullOptions.temperature,
-      top_p: fullOptions.topP,
-      stream: false,
-    }),
-  });
-
+  const res = await fetchChatCompletionResponse(messages, options);
   const text = await res.text();
 
   if (!res.ok) {
@@ -55,6 +41,46 @@ export async function fetchChatCompletion(
   };
 
   return json.choices[0].message.content;
+}
+
+export async function fetchChatCompletionStream(
+  messages: { role: "user" | "assistant" | "system"; content: string }[],
+  options?: Partial<ChatCompletionOptions>
+): Promise<ReadableStream> {
+  const res = await fetchChatCompletionResponse(messages, options, true);
+
+  if (!res.body) {
+    throw new Error("OpenAI API response has no body");
+  }
+
+  return res.body;
+}
+
+async function fetchChatCompletionResponse(
+  messages: { role: "user" | "assistant" | "system"; content: string }[],
+  options: Partial<ChatCompletionOptions> = {},
+  stream: boolean = false
+): Promise<Response> {
+  const fullOptions = getChatCompletionOptions(options);
+
+  return await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${fullOptions.apiKey}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      messages,
+      frequency_penalty: fullOptions.frequencyPenalty,
+      max_tokens: fullOptions.maxTokens,
+      model: fullOptions.model,
+      presence_penalty: fullOptions.presencePenalty,
+      temperature: fullOptions.temperature,
+      top_p: fullOptions.topP,
+      stream,
+    }),
+  });
 }
 
 function getOpenAiApiKey(): string {
