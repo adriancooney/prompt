@@ -2,7 +2,8 @@
   "name": "@adriancooney/prompt",
   "version": "0.0.1",
   "description": "Prompt library",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "scripts": {
     "build": "tsup",
     "release": "yarn build && changeset publish",
@@ -16,12 +17,17 @@
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
-    "@types/dedent": "^0.7.0",
     "@types/jest": "^29.5.1",
     "jest": "^29.5.0",
     "ts-jest": "^29.1.0",
     "tsup": "^6.7.0",
     "typescript": "^5.0.4"
+  },
+  "exports": {
+    "default": "./dist/index.js",
+    "require": "./dist/index.js",
+    "import": "./dist/index.mjs",
+    "node": "./dist/index.js"
   },
   "tsup": {
     "entry": [
