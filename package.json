@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "tsup",
+    "release": "yarn build && changeset publish",
     "test": "jest"
   },
   "files": [
