@@ -1,11 +1,6 @@
-import {
-  ChatMessage,
-  PromptResponse,
-  SystemMessage,
-  prompt,
-  system,
-  user,
-} from "./prompt";
+import { system, user } from "./message";
+import { prompt } from "./prompt";
+import { ChatMessage, PromptResponse, SystemMessage } from "./types";
 
 type DocumentsMessage = Omit<SystemMessage, "metadata"> & {
   metadata: {
@@ -24,10 +19,11 @@ export async function promptWithDocuments(
   return await prompt([
     system(
       `
-      Given the following extracted parts of a long document and a question, create a final answer.
-      If you don't know the answer, just say that you don't know. Don't try to make up an answer. Please include references if any.
+Given the following extracted parts of a long document and a question, create a final answer.
+If you don't know the answer, just say that you don't know. Don't try to make up an answer.
+Please include references if any.
 
-      ${documents.join("\n\n")}
+${documents.join("\n")}
     `,
       {
         documents,

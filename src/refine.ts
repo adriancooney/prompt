@@ -1,4 +1,6 @@
-import { PromptResponse, system, prompt, ChatMessage, user } from "./prompt";
+import { system, user } from "./message";
+import { prompt } from "./prompt";
+import { ChatMessage, PromptResponse } from "./types";
 
 export async function refine(
   question: string,
