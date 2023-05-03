@@ -1,3 +1,4 @@
+import { encode } from "gpt-3-encoder";
 import { ai, user } from "./message";
 import {
   ChatCompletionMessage,
@@ -14,11 +15,7 @@ export async function prompt(
   const { prompts: castedPrompts, serializedPrompts } = createPrompts(prompts);
   const output = await fetchChatCompletion(serializedPrompts, options);
 
-  return {
-    output,
-    prompts: castedPrompts.concat(ai(output)),
-    timestamp: Date.now(),
-  };
+  return createPromptResponse(castedPrompts, output);
 }
 
 export async function promptStream(
@@ -43,13 +40,29 @@ export async function promptStream(
       async flush() {
         const output = chunks.join("");
 
-        await options.onComplete?.({
-          output,
-          prompts: castedPrompts.concat(ai(output)),
-          timestamp: Date.now(),
-        });
+        await options.onComplete?.(createPromptResponse(castedPrompts, output));
       },
     })
+  );
+}
+
+function createPromptResponse(
+  prompts: ChatMessage[],
+  output: string
+): PromptResponse {
+  const allPrompts = prompts.concat(ai(output));
+  return {
+    output,
+    prompts: allPrompts,
+    timestamp: Date.now(),
+    estimatedTokens: countTokens(allPrompts),
+  };
+}
+
+function countTokens(prompts: ChatMessage[]): number {
+  return prompts.reduce(
+    (acc, prompt) => acc + encode(prompt.content).length + 4,
+    0
   );
 }
 

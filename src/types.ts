@@ -21,4 +21,5 @@ export type PromptResponse = {
   prompts: ChatMessage[];
   output: string;
   timestamp: number;
+  estimatedTokens: number;
 };

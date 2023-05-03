@@ -36,6 +36,8 @@ export async function fetchChatCompletion(
     }[];
   };
 
+  console.log(json);
+
   return json.choices[0].message.content;
 }
 
@@ -49,7 +51,44 @@ export async function fetchChatCompletionStream(
     throw new Error("OpenAI API response has no body");
   }
 
-  return res.body;
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+
+  return res.body.pipeThrough(
+    new TransformStream({
+      transform(chunk, controller) {
+        // controller.enqueue(chunk);
+        const event = decoder.decode(chunk);
+        const lines = event
+          .split("\n")
+          .map((line) => line.replace(/^data: /, "").trim());
+
+        for (const line of lines) {
+          if (!line || line === "[DONE]") {
+            continue;
+          }
+
+          try {
+            const data = JSON.parse(line) as {
+              choices: {
+                delta: {
+                  content?: string;
+                };
+              }[];
+            };
+
+            const token = data.choices[0].delta.content;
+
+            if (token) {
+              controller.enqueue(encoder.encode(token));
+            }
+          } catch (err) {
+            controller.error(err);
+          }
+        }
+      },
+    })
+  );
 }
 
 async function fetchChatCompletionResponse(

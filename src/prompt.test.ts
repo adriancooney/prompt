@@ -1,6 +1,7 @@
 import { ai, system, user } from "./message";
 import { prompt, promptStream } from "./prompt";
 import { fetchChatCompletion, fetchChatCompletionStream } from "./openai";
+import { text, textStream } from "../tests/util";
 
 jest.mock("./openai");
 
@@ -25,6 +26,7 @@ describe("prompt", () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
+          "estimatedTokens": 39,
           "output": "Who's there?",
           "prompts": [
             {
@@ -56,6 +58,7 @@ describe("prompt", () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
+          "estimatedTokens": 16,
           "output": "Who's there?",
           "prompts": [
             {
@@ -97,6 +100,7 @@ describe("prompt", () => {
 
       expect(response).toMatchInlineSnapshot(`
         {
+          "estimatedTokens": 12,
           "output": "Wow",
           "prompts": [
             {
@@ -114,38 +118,3 @@ describe("prompt", () => {
     });
   });
 });
-
-async function text(stream: ReadableStream): Promise<string> {
-  const reader = stream.getReader();
-  const decoder = new TextDecoder();
-  const chunks = [];
-
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-
-      chunks.push(decoder.decode(value));
-
-      if (done) {
-        return chunks.join("");
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
-}
-
-function textStream(content: string): ReadableStream {
-  let done = false;
-  const encoder = new TextEncoder();
-  return new ReadableStream({
-    pull(controller) {
-      if (done) {
-        controller.close();
-      } else {
-        controller.enqueue(encoder.encode(content));
-        done = true;
-      }
-    },
-  });
-}

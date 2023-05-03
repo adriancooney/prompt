@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsup",
     "release": "yarn build && changeset publish",
-    "test": "jest"
+    "test": "jest",
+    "test:ci": "yarn test --testPathIgnorePatterns integration.test.ts"
   },
   "files": [
     "dist/",
@@ -24,10 +25,10 @@
     "typescript": "^5.0.4"
   },
   "exports": {
-    "default": "./dist/index.js",
     "require": "./dist/index.js",
     "import": "./dist/index.mjs",
-    "node": "./dist/index.js"
+    "node": "./dist/index.js",
+    "default": "./dist/index.js"
   },
   "tsup": {
     "entry": [
@@ -42,5 +43,9 @@
       "esm",
       "iife"
     ]
+  },
+  "dependencies": {
+    "eventsource-parser": "^1.0.0",
+    "gpt-3-encoder": "^1.1.4"
   }
 }

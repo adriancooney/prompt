@@ -8,7 +8,7 @@ export async function refine(
 ): Promise<PromptResponse> {
   return await prompt([
     system(`
-      Given the following conversation and a follow up question, rephrase the follow up
+      Given the following context and a follow up question, rephrase the follow up
       question to be a standalone question.
     `),
     ...prompts,
