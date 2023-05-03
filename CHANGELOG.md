@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.0.5
+
+### Patch Changes
+
+- 0cc97b6: Clean up deps
+
 ## 0.0.4
 
 ### Patch Changes
