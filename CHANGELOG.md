@@ -1,5 +1,12 @@
 # @adriancooney/prompt
 
+## 0.0.4
+
+### Patch Changes
+
+- 8a4ad3c: Streaming support with callback
+- df5939a: Token count, refine
+
 ## 0.0.3
 
 ### Patch Changes
