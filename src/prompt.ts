@@ -23,11 +23,34 @@ export async function prompt(
 
 export async function promptStream(
   prompts: (string | ChatMessage)[],
-  options: { openAiApiKey?: string } & Partial<ChatCompletionOptions> = {}
+  options: {
+    openAiApiKey?: string;
+    onComplete?: (res: PromptResponse) => void | Promise<void>;
+  } & Partial<ChatCompletionOptions> = {}
 ): Promise<ReadableStream> {
   const { prompts: castedPrompts, serializedPrompts } = createPrompts(prompts);
 
-  return await fetchChatCompletionStream(serializedPrompts, options);
+  const res = await fetchChatCompletionStream(serializedPrompts, options);
+  const decoder = new TextDecoder();
+  const chunks: string[] = [];
+
+  return res.pipeThrough(
+    new TransformStream({
+      transform(chunk, controller) {
+        chunks.push(decoder.decode(chunk));
+        controller.enqueue(chunk);
+      },
+      async flush() {
+        const output = chunks.join("");
+
+        await options.onComplete?.({
+          output,
+          prompts: castedPrompts.concat(ai(output)),
+          timestamp: Date.now(),
+        });
+      },
+    })
+  );
 }
 
 function createPrompts(prompts: (string | ChatMessage)[]): {

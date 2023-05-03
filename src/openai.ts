@@ -27,10 +27,6 @@ export async function fetchChatCompletion(
   const res = await fetchChatCompletionResponse(messages, options);
   const text = await res.text();
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch OpenAI API: ${text.slice(0, 1000)}`);
-  }
-
   const json = JSON.parse(text) as {
     choices: {
       message: {
@@ -63,7 +59,7 @@ async function fetchChatCompletionResponse(
 ): Promise<Response> {
   const fullOptions = getChatCompletionOptions(options);
 
-  return await fetch("https://api.openai.com/v1/chat/completions", {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${fullOptions.apiKey}`,
@@ -81,6 +77,14 @@ async function fetchChatCompletionResponse(
       stream,
     }),
   });
+
+  if (!res.ok) {
+    const text = await res.text();
+
+    throw new Error(`Failed to fetch OpenAI API: ${text.slice(0, 1000)}`);
+  }
+
+  return res;
 }
 
 function getOpenAiApiKey(): string {
