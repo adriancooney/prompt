@@ -61,7 +61,7 @@ function createPromptResponse(
 function countTokens(prompts: ChatMessage[]): number {
   return prompts.reduce(
     (acc, prompt) =>
-      acc + (prompt.content.split(/[\s\.,;!?]+/).length / 3) * 4 + 4,
+      acc + Math.round(prompt.content.split(/[\s\.,;!?]+/).length / 3) * 4 + 4,
     0
   );
 }

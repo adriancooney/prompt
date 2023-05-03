@@ -26,7 +26,7 @@ describe("prompt", () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
-          "estimatedTokens": 39,
+          "estimatedTokens": 40,
           "output": "Who's there?",
           "prompts": [
             {
