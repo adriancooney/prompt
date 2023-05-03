@@ -1691,11 +1691,6 @@ esprima@^4.0.0:
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
   integrity sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==
 
-eventsource-parser@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/eventsource-parser/-/eventsource-parser-1.0.0.tgz#6332e37fd5512e3c8d9df05773b2bf9e152ccc04"
-  integrity sha512-9jgfSCa3dmEme2ES3mPByGXfgZ87VbP97tng1G2nWwWx6bV2nYxm2AWCrbQjXToSe+yYlqaZNtxffR9IeQr95g==
-
 execa@^5.0.0:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/execa/-/execa-5.1.1.tgz#f80ad9cbf4298f7bd1d4c9555c21e93741c411dd"
@@ -1955,11 +1950,6 @@ gopd@^1.0.1:
   integrity sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==
   dependencies:
     get-intrinsic "^1.1.3"
-
-gpt-3-encoder@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/gpt-3-encoder/-/gpt-3-encoder-1.1.4.tgz#d6cdaacf5824857e133b6065247c757fc7e4fa72"
-  integrity sha512-fSQRePV+HUAhCn7+7HL7lNIXNm6eaFWFbNLOOGtmSJ0qJycyQvj60OvRlH7mee8xAMjBDNRdMXlMwjAbMTDjkg==
 
 graceful-fs@^4.1.2, graceful-fs@^4.1.5, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.9:
   version "4.2.11"

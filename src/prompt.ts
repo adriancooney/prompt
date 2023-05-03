@@ -1,4 +1,3 @@
-import { encode } from "gpt-3-encoder";
 import { ai, user } from "./message";
 import {
   ChatCompletionMessage,
@@ -61,7 +60,8 @@ function createPromptResponse(
 
 function countTokens(prompts: ChatMessage[]): number {
   return prompts.reduce(
-    (acc, prompt) => acc + encode(prompt.content).length + 4,
+    (acc, prompt) =>
+      acc + (prompt.content.split(/[\s\.,;!?]+/).length / 3) * 4 + 4,
     0
   );
 }

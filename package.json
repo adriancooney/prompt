@@ -44,8 +44,5 @@
       "iife"
     ]
   },
-  "dependencies": {
-    "eventsource-parser": "^1.0.0",
-    "gpt-3-encoder": "^1.1.4"
-  }
+  "dependencies": {}
 }

@@ -57,7 +57,6 @@ export async function fetchChatCompletionStream(
   return res.body.pipeThrough(
     new TransformStream({
       transform(chunk, controller) {
-        // controller.enqueue(chunk);
         const event = decoder.decode(chunk);
         const lines = event
           .split("\n")
