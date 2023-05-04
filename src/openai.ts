@@ -1,3 +1,5 @@
+import { debug } from "./debug";
+
 const DEFAULT_OPEN_AI_FREQUENCY_PENALTY = 0;
 const DEFAULT_OPEN_AI_MAX_TOKENS = 1000;
 const DEFAULT_OPEN_AI_MODEL = "gpt-3.5-turbo";
@@ -35,8 +37,6 @@ export async function fetchChatCompletion(
       };
     }[];
   };
-
-  console.log(json);
 
   return json.choices[0].message.content;
 }
@@ -79,6 +79,7 @@ export async function fetchChatCompletionStream(
             const token = data.choices[0].delta.content;
 
             if (token) {
+              debug(`<< token: ${token}`);
               controller.enqueue(encoder.encode(token));
             }
           } catch (err) {
@@ -95,12 +96,18 @@ async function fetchChatCompletionResponse(
   options: Partial<ChatCompletionOptions> = {},
   stream: boolean = false
 ): Promise<Response> {
-  const fullOptions = getChatCompletionOptions(options);
+  const { apiKey, ...fullOptions } = getChatCompletionOptions(options);
+
+  debug(`>> POST https://api.openai.com/v1/chat/completions`, {
+    ...fullOptions,
+    stream,
+    messages,
+  });
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${fullOptions.apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
@@ -119,8 +126,17 @@ async function fetchChatCompletionResponse(
   if (!res.ok) {
     const text = await res.text();
 
+    debug(
+      `!! POST https://api.openai.com/v1/chat/completions failed ${res.status} ${res.statusText}`,
+      { text }
+    );
+
     throw new Error(`Failed to fetch OpenAI API: ${text.slice(0, 1000)}`);
   }
+
+  debug(
+    `<< POST https://api.openai.com/v1/chat/completions ${res.status} ${res.statusText}`
+  );
 
   return res;
 }
