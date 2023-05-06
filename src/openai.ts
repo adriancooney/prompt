@@ -25,7 +25,7 @@ export type ChatCompletionOptions = {
 export async function fetchChatCompletion(
   messages: ChatCompletionMessage[],
   options?: Partial<ChatCompletionOptions>
-): Promise<string> {
+): Promise<{ output: string; tokenCount: number }> {
   const res = await fetchChatCompletionResponse(messages, options);
   const text = await res.text();
 
@@ -36,9 +36,15 @@ export async function fetchChatCompletion(
         content: string;
       };
     }[];
+    usage: {
+      total_tokens: number;
+    };
   };
 
-  return json.choices[0].message.content;
+  return {
+    output: json.choices[0].message.content,
+    tokenCount: json.usage.total_tokens,
+  };
 }
 
 export async function fetchChatCompletionStream(

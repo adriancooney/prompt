@@ -15,7 +15,10 @@ describe("prompt", () => {
 
   describe("prompt", () => {
     it("handles sending multiple messages", async () => {
-      fetchChatCompletionMock.mockResolvedValueOnce("Who's there?");
+      fetchChatCompletionMock.mockResolvedValueOnce({
+        output: "Who's there?",
+        tokenCount: 3,
+      });
 
       const question = "Knock Knock?";
       const result = await prompt([
@@ -26,7 +29,7 @@ describe("prompt", () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
-          "estimatedTokens": 40,
+          "estimatedTokens": 3,
           "output": "Who's there?",
           "prompts": [
             {
@@ -52,13 +55,16 @@ describe("prompt", () => {
     });
 
     it("converts input strings to user messages", async () => {
-      fetchChatCompletionMock.mockResolvedValueOnce("Who's there?");
+      fetchChatCompletionMock.mockResolvedValueOnce({
+        output: "Who's there?",
+        tokenCount: 3,
+      });
 
       const result = await prompt(["Knock knock?"]);
 
       expect(result).toMatchInlineSnapshot(`
         {
-          "estimatedTokens": 16,
+          "estimatedTokens": 3,
           "output": "Who's there?",
           "prompts": [
             {
@@ -100,7 +106,7 @@ describe("prompt", () => {
 
       expect(response).toMatchInlineSnapshot(`
         {
-          "estimatedTokens": 12,
+          "estimatedTokens": 16,
           "output": "Wow",
           "prompts": [
             {

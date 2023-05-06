@@ -5,6 +5,7 @@ import {
   fetchChatCompletion,
   fetchChatCompletionStream,
 } from "./openai";
+import { getChatEstimatedTokenCount } from "./tokens";
 import { ChatMessage, PromptResponse } from "./types";
 
 export async function prompt(
@@ -12,9 +13,12 @@ export async function prompt(
   options: { openAiApiKey?: string } & Partial<ChatCompletionOptions> = {}
 ): Promise<PromptResponse> {
   const { prompts: castedPrompts, serializedPrompts } = createPrompts(prompts);
-  const output = await fetchChatCompletion(serializedPrompts, options);
+  const { output, tokenCount } = await fetchChatCompletion(
+    serializedPrompts,
+    options
+  );
 
-  return createPromptResponse(castedPrompts, output);
+  return createPromptResponse(castedPrompts, output, tokenCount);
 }
 
 export async function promptStream(
@@ -47,23 +51,18 @@ export async function promptStream(
 
 function createPromptResponse(
   prompts: ChatMessage[],
-  output: string
+  output: string,
+  tokenCount?: number
 ): PromptResponse {
+  const timestamp = Date.now();
   const allPrompts = prompts.concat(ai(output));
+
   return {
     output,
     prompts: allPrompts,
-    timestamp: Date.now(),
-    estimatedTokens: countTokens(allPrompts),
+    timestamp,
+    estimatedTokens: tokenCount ?? getChatEstimatedTokenCount(allPrompts),
   };
-}
-
-function countTokens(prompts: ChatMessage[]): number {
-  return prompts.reduce(
-    (acc, prompt) =>
-      acc + Math.round(prompt.content.split(/[\s\.,;!?]+/).length / 3) * 4 + 4,
-    0
-  );
 }
 
 function createPrompts(prompts: (string | ChatMessage)[]): {
