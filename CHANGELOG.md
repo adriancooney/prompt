@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.0.7
+
+### Patch Changes
+
+- 0b2b883: Add estimated token counts
+
 ## 0.0.6
 
 ### Patch Changes
