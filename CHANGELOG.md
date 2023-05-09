@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.0.8
+
+### Patch Changes
+
+- 609140c: Model and onToken
+
 ## 0.0.7
 
 ### Patch Changes
