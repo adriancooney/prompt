@@ -1,3 +1,5 @@
+import { ChatCompletionOptions } from "./openai";
+
 type Message = {
   content: string;
   metadata?: any;
@@ -22,4 +24,5 @@ export type PromptResponse = {
   output: string;
   timestamp: number;
   estimatedTokens: number;
+  model: ChatCompletionOptions["model"];
 };

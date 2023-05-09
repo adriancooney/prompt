@@ -4,6 +4,7 @@ import {
   ChatCompletionOptions,
   fetchChatCompletion,
   fetchChatCompletionStream,
+  getChatCompletionOptions,
 } from "./openai";
 import { getChatEstimatedTokenCount } from "./tokens";
 import { ChatMessage, PromptResponse } from "./types";
@@ -18,13 +19,14 @@ export async function prompt(
     options
   );
 
-  return createPromptResponse(castedPrompts, output, tokenCount);
+  return createPromptResponse(options, castedPrompts, output, tokenCount);
 }
 
 export async function promptStream(
   prompts: (string | ChatMessage)[],
   options: {
     openAiApiKey?: string;
+    onToken?: (token: string, res: PromptResponse) => void | Promise<void>;
     onComplete?: (res: PromptResponse) => void | Promise<void>;
   } & Partial<ChatCompletionOptions> = {}
 ): Promise<ReadableStream> {
@@ -36,28 +38,42 @@ export async function promptStream(
 
   return res.pipeThrough(
     new TransformStream({
-      transform(chunk, controller) {
-        chunks.push(decoder.decode(chunk));
+      async transform(chunk, controller) {
+        const token = decoder.decode(chunk);
+
+        chunks.push(token);
         controller.enqueue(chunk);
+
+        if (options.onToken) {
+          await options.onToken(
+            token,
+            createPromptResponse(options, castedPrompts, chunks.join(""))
+          );
+        }
       },
       async flush() {
-        const output = chunks.join("");
-
-        await options.onComplete?.(createPromptResponse(castedPrompts, output));
+        if (options.onComplete) {
+          await options.onComplete(
+            createPromptResponse(options, castedPrompts, chunks.join(""))
+          );
+        }
       },
     })
   );
 }
 
 function createPromptResponse(
+  options: Partial<ChatCompletionOptions>,
   prompts: ChatMessage[],
   output: string,
   tokenCount?: number
 ): PromptResponse {
+  const { model } = getChatCompletionOptions(options);
   const timestamp = Date.now();
   const allPrompts = prompts.concat(ai(output));
 
   return {
+    model,
     output,
     prompts: allPrompts,
     timestamp,

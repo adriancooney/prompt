@@ -54,7 +54,7 @@ export async function fetchChatCompletionStream(
   const res = await fetchChatCompletionResponse(messages, options, true);
 
   if (!res.body) {
-    throw new Error("OpenAI API response has no body");
+    throw new Error("OpenAI API response has no body, cannot create stream");
   }
 
   const decoder = new TextDecoder();
@@ -157,7 +157,7 @@ function getOpenAiApiKey(): string {
   return key;
 }
 
-function getChatCompletionOptions(
+export function getChatCompletionOptions(
   options?: Partial<ChatCompletionOptions>
 ): ChatCompletionOptions {
   return {
