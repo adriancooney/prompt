@@ -6,7 +6,7 @@ import {
   fetchChatCompletionStream,
   getChatCompletionOptions,
 } from "./openai";
-import { getChatEstimatedTokenCount } from "./tokens";
+import { getChatEstimatedTokenCount, getEncoder } from "./tokens";
 import { ChatMessage, PromptResponse } from "./types";
 
 export async function prompt(
@@ -19,7 +19,7 @@ export async function prompt(
     options
   );
 
-  return createPromptResponse(options, castedPrompts, output, tokenCount);
+  return await createPromptResponse(options, castedPrompts, output, tokenCount);
 }
 
 export async function promptStream(
@@ -47,14 +47,14 @@ export async function promptStream(
         if (options.onToken) {
           await options.onToken(
             token,
-            createPromptResponse(options, castedPrompts, chunks.join(""))
+            await createPromptResponse(options, castedPrompts, chunks.join(""))
           );
         }
       },
       async flush() {
         if (options.onComplete) {
           await options.onComplete(
-            createPromptResponse(options, castedPrompts, chunks.join(""))
+            await createPromptResponse(options, castedPrompts, chunks.join(""))
           );
         }
       },
@@ -62,13 +62,16 @@ export async function promptStream(
   );
 }
 
-function createPromptResponse(
+async function createPromptResponse(
   options: Partial<ChatCompletionOptions>,
   prompts: ChatMessage[],
   output: string,
   tokenCount?: number
-): PromptResponse {
-  const { model } = getChatCompletionOptions(options);
+): Promise<PromptResponse> {
+  const encoder = await getEncoder();
+  const m = getChatCompletionOptions(options);
+  console.log({ m });
+  const model = m.model;
   const timestamp = Date.now();
   const allPrompts = prompts.concat(ai(output));
 
@@ -77,7 +80,8 @@ function createPromptResponse(
     output,
     prompts: allPrompts,
     timestamp,
-    estimatedTokens: tokenCount ?? getChatEstimatedTokenCount(allPrompts),
+    estimatedTokens:
+      tokenCount ?? getChatEstimatedTokenCount(encoder, allPrompts),
   };
 }
 
