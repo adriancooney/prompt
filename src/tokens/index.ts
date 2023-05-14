@@ -1,6 +1,59 @@
-import { encode } from "./encoder";
+import { data as encoderRawData } from "./encoder-data.compressed";
+import { data as encoderRawBpe } from "./encoder-bpe.compressed";
+import { createEncoder } from "./encoder";
 
-export function getEstimatedTokenCount(text: string): number {
+export interface Encoder {
+  encode: (text: string) => number[];
+  decode: (data: number[]) => string;
+}
+
+let _encoder: Encoder;
+
+export async function getEncoder(): Promise<Encoder> {
+  if (!_encoder) {
+    const encoderData = JSON.parse(await decompressBlob(encoderRawData));
+    const encoderBpe = await decompressBlob(encoderRawBpe);
+    _encoder = createEncoder(encoderData, encoderBpe);
+  }
+
+  return _encoder;
+}
+
+async function decompressBlob(data: string) {
+  const base64Data = await new Blob([data], { type: "text/plain" }).text();
+  const gzipBlob = b64toBlob(base64Data, "application/gzip");
+
+  // @ts-ignore
+  const decompressionStream = new DecompressionStream("gzip");
+  const decompressedStream = gzipBlob.stream().pipeThrough(decompressionStream);
+
+  return await new Response(decompressedStream).text();
+}
+
+function b64toBlob(data: string, contentType: string, sliceSize = 512): Blob {
+  const byteCharacters = atob(data);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  const blob = new Blob(byteArrays, { type: contentType });
+  return blob;
+}
+
+export function getEstimatedTokenCount(
+  { encode }: Encoder,
+  text: string
+): number {
   return encode(text).length;
 }
 
@@ -36,23 +89,28 @@ export function getEstimatedTokenCount(text: string): number {
  * ```
  */
 export function getChatEstimatedTokenCount(
+  encoder: Encoder,
   messages: { name?: string; content: string }[]
 ): number {
   return (
     messages.reduce(
-      (acc, message) => acc + 4 + getChatMessageEstimatedTokenCount(message),
+      (acc, message) =>
+        acc + 4 + getChatMessageEstimatedTokenCount(encoder, message),
       0
     ) + 2 // every reply is primed with <im_start>assistant
   );
 }
 
-function getChatMessageEstimatedTokenCount(message: {
-  name?: string;
-  content: string;
-}): number {
+function getChatMessageEstimatedTokenCount(
+  encoder: Encoder,
+  message: {
+    name?: string;
+    content: string;
+  }
+): number {
   return (
     // If there's a name, count the token for the name otherwise the role is used (always 1 token)
-    (message.name ? getEstimatedTokenCount(message.name) : 1) +
-    getEstimatedTokenCount(message.content)
+    (message.name ? getEstimatedTokenCount(encoder, message.name) : 1) +
+    getEstimatedTokenCount(encoder, message.content)
   );
 }
