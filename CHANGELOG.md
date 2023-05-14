@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.0.9
+
+### Patch Changes
+
+- 435e1cd: Compressed data
+
 ## 0.0.8
 
 ### Patch Changes
