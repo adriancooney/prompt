@@ -53,4 +53,12 @@ describe("prompt (integration)", () => {
       ).toBeLessThan(15);
     }
   );
+
+  it("streams", async () => {
+    const prompt = await new Response(
+      await promptStream([user("Hello world")])
+    ).text();
+
+    expect(prompt).toEqual(expect.any(String));
+  });
 });

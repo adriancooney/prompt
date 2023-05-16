@@ -1,3 +1,8 @@
+import {
+  ParsedEvent,
+  ReconnectInterval,
+  createParser,
+} from "eventsource-parser";
 import { debug } from "./debug";
 
 const DEFAULT_OPEN_AI_FREQUENCY_PENALTY = 0;
@@ -60,41 +65,36 @@ export async function fetchChatCompletionStream(
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
 
-  return res.body.pipeThrough(
-    new TransformStream({
-      transform(chunk, controller) {
-        const event = decoder.decode(chunk);
-        const lines = event
-          .split("\n")
-          .map((line) => line.replace(/^data: /, "").trim());
+  const readable = new ReadableStream({
+    async start(controller) {
+      function onParse(event: ParsedEvent | ReconnectInterval) {
+        try {
+          if (event.type === "event") {
+            const data = event.data;
 
-        for (const line of lines) {
-          if (!line || line === "[DONE]") {
-            continue;
-          }
-
-          try {
-            const data = JSON.parse(line) as {
-              choices: {
-                delta: {
-                  content?: string;
-                };
-              }[];
-            };
-
-            const token = data.choices[0].delta.content;
-
-            if (token) {
-              debug(`<< token: ${token}`);
-              controller.enqueue(encoder.encode(token));
+            if (data === "[DONE]") {
+              controller.close();
+              return;
             }
-          } catch (err) {
-            controller.error(err);
+
+            const json = JSON.parse(data);
+            const token = json.choices[0].text;
+            controller.enqueue(encoder.encode(token));
           }
+        } catch (err) {
+          controller.error(err);
         }
-      },
-    })
-  );
+      }
+
+      const parser = createParser(onParse);
+
+      for await (const chunk of res.body as any) {
+        parser.feed(decoder.decode(chunk));
+      }
+    },
+  });
+
+  return readable;
 }
 
 async function fetchChatCompletionResponse(

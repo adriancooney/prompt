@@ -44,5 +44,7 @@
       "iife"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "eventsource-parser": "^1.0.0"
+  }
 }

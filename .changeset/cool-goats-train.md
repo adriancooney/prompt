@@ -1,0 +1,5 @@
+---
+"@adriancooney/prompt": patch
+---
+
+eventsource
