@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.0.10
+
+### Patch Changes
+
+- 1857ae7: eventsource
+
 ## 0.0.9
 
 ### Patch Changes
