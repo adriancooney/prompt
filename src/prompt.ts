@@ -6,7 +6,6 @@ import {
   fetchChatCompletionStream,
   getChatCompletionOptions,
 } from "./openai";
-import { getChatEstimatedTokenCount, getEncoder } from "./tokens";
 import { ChatMessage, PromptResponse } from "./types";
 
 export async function prompt(
@@ -68,10 +67,7 @@ async function createPromptResponse(
   output: string,
   tokenCount?: number
 ): Promise<PromptResponse> {
-  const encoder = await getEncoder();
-  const m = getChatCompletionOptions(options);
-  console.log({ m });
-  const model = m.model;
+  const { model } = getChatCompletionOptions(options);
   const timestamp = Date.now();
   const allPrompts = prompts.concat(ai(output));
 
@@ -80,8 +76,7 @@ async function createPromptResponse(
     output,
     prompts: allPrompts,
     timestamp,
-    estimatedTokens:
-      tokenCount ?? getChatEstimatedTokenCount(encoder, allPrompts),
+    estimatedTokens: tokenCount ?? -1,
   };
 }
 
