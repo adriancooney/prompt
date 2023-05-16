@@ -59,6 +59,7 @@ describe("prompt (integration)", () => {
       await promptStream([user("Hello world")])
     ).text();
 
+    expect(prompt.trim().length).toBeGreaterThan(1);
     expect(prompt).toEqual(expect.any(String));
   });
 });

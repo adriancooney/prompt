@@ -78,7 +78,8 @@ export async function fetchChatCompletionStream(
             }
 
             const json = JSON.parse(data);
-            const token = json.choices[0].text;
+            const token = json.choices[0].delta.content;
+
             controller.enqueue(encoder.encode(token));
           }
         } catch (err) {
