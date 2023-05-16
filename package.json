@@ -1,6 +1,6 @@
 {
   "name": "@adriancooney/prompt",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Prompt library",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
