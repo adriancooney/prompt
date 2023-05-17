@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.0.13
+
+### Patch Changes
+
+- e426fa1: Fix errors?
+
 ## 0.0.12
 
 ### Patch Changes
