@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.0.14
+
+### Patch Changes
+
+- 202fcd5: Re-add token counts
+
 ## 0.0.13
 
 ### Patch Changes
