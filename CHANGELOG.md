@@ -1,5 +1,12 @@
 # @adriancooney/prompt
 
+## 0.0.12
+
+### Patch Changes
+
+- e7fb7fd: Fix missing tokens
+- b6489c6: Improved errors
+
 ## 0.0.11
 
 ### Patch Changes
