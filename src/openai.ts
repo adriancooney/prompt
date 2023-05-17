@@ -4,6 +4,7 @@ import {
   createParser,
 } from "eventsource-parser";
 import { debug } from "./debug";
+import { OpenAIError, OpenAIModelOverloadedError } from "./errors";
 
 const DEFAULT_OPEN_AI_FREQUENCY_PENALTY = 0;
 const DEFAULT_OPEN_AI_MAX_TOKENS = 1000;
@@ -11,6 +12,8 @@ const DEFAULT_OPEN_AI_MODEL = "gpt-3.5-turbo";
 const DEFAULT_OPEN_AI_PRESENCE_PENALTY = 0;
 const DEFAULT_OPEN_AI_TEMPERATURE = 0.7;
 const DEFAULT_OPEN_AI_TOP_P = 1;
+
+const SERVER_OVERLOADED_ERROR_MATCHER = /overloaded/i;
 
 export type ChatCompletionMessage = {
   role: "user" | "assistant" | "system";
@@ -138,7 +141,31 @@ async function fetchChatCompletionResponse(
       { text }
     );
 
-    throw new Error(`Failed to fetch OpenAI API: ${text.slice(0, 1000)}`);
+    try {
+      const { error } = JSON.parse(text) as {
+        error: {
+          message: string;
+          type: string;
+          code: string | null;
+        };
+      };
+
+      if (error.message.match(SERVER_OVERLOADED_ERROR_MATCHER)) {
+        throw new OpenAIModelOverloadedError(
+          error.type,
+          error.code,
+          error.message
+        );
+      }
+
+      throw new OpenAIError(error.type, error.code, error.message);
+    } catch (err) {
+      throw new OpenAIError(
+        "unknown",
+        null,
+        `Failed to fetch OpenAI API: ${text.slice(0, 1000)}`
+      );
+    }
   }
 
   debug(
@@ -148,7 +175,7 @@ async function fetchChatCompletionResponse(
   return res;
 }
 
-function getOpenAiApiKey(): string {
+function getOpenAIApiKey(): string {
   const key = process.env.OPENAI_API_KEY;
 
   if (!key) {
@@ -162,7 +189,7 @@ export function getChatCompletionOptions(
   options?: Partial<ChatCompletionOptions>
 ): ChatCompletionOptions {
   return {
-    apiKey: getOpenAiApiKey(),
+    apiKey: getOpenAIApiKey(),
     frequencyPenalty:
       safeParseNumber(process.env.OPEN_AI_FREQUENCY_PENALTY) ||
       DEFAULT_OPEN_AI_FREQUENCY_PENALTY,

@@ -8,3 +8,4 @@ export type {
   UserMessage,
   AIMessage,
 } from "./types";
+export { OpenAIError, OpenAIModelOverloadedError } from "./errors";
