@@ -1,7 +1,7 @@
 {
   "name": "@adriancooney/prompt",
   "version": "0.1.1",
-  "description": "Prompt library",
+  "description": "A lightweight interface to OpenAI's Chat-based LLMs",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "scripts": {
@@ -35,7 +35,7 @@
       "src/index.ts"
     ],
     "splitting": false,
-    "sourcemap": true,
+    "sourcemap": false,
     "clean": true,
     "dts": true,
     "format": [
