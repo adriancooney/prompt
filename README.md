@@ -78,6 +78,8 @@ console.log(output);
 To stream your response from an Edge function in Next.js, use the `promptStream` method. It's options are the same with the addition of two callbacks, `onToken` and `onComplete`.
 
 ```ts
+import { promptStream, system, user } from "@adriancooney/prompt";
+
 export const runtime = "edge";
 
 export async function POST(request: Request) {
@@ -149,4 +151,84 @@ try {
 
   throw err;
 }
+```
+
+### Interface
+
+```ts
+type ChatCompletionOptions = {
+  apiKey: string;
+  frequencyPenalty: number;
+  maxTokens: number;
+  model: "gpt-3.5-turbo" | "gpt-4";
+  presencePenalty: number;
+  temperature: number;
+  topP: number;
+};
+
+type Message = {
+  content: string;
+  metadata?: any;
+};
+
+type SystemMessage = Message & {
+  role: "system";
+};
+
+type UserMessage = Message & {
+  role: "user";
+};
+
+type AIMessage = Message & {
+  role: "ai";
+};
+
+type ChatMessage = SystemMessage | UserMessage | AIMessage;
+
+type PromptResponse = {
+  prompts: ChatMessage[];
+  output: string;
+  timestamp: number;
+  duration: number;
+  estimatedTokens: number;
+  model: ChatCompletionOptions["model"];
+};
+
+declare function prompt(
+  prompts: (string | ChatMessage)[],
+  options?: Partial<ChatCompletionOptions>
+): Promise<PromptResponse>;
+
+declare function promptStream(
+  prompts: (string | ChatMessage)[],
+  options?: {
+    onToken?: (token: string, res: PromptResponse) => void | Promise<void>;
+    onComplete?: (res: PromptResponse) => void | Promise<void>;
+  } & Partial<ChatCompletionOptions>
+): Promise<ReadableStream>;
+
+declare function system(content: string, metadata?: any): SystemMessage;
+declare function user(content: string, metadata?: string): UserMessage;
+declare function ai(content: string, metadata?: any): AIMessage;
+
+declare class OpenAIError extends Error {
+  type: string;
+  code: string | null;
+  constructor(type: string, code: string | null, message: string);
+}
+declare class OpenAIModelOverloadedError extends OpenAIError {}
+
+export {
+  AIMessage,
+  ChatMessage,
+  OpenAIError,
+  OpenAIModelOverloadedError,
+  SystemMessage,
+  UserMessage,
+  ai,
+  prompt,
+  promptStream,
+  system,
+  user,
+};
 ```

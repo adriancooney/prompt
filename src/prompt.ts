@@ -8,12 +8,7 @@ import {
 import { getChatEstimatedTokenCount, getEncoder } from "./tokens";
 import { ChatMessage, PromptResponse } from "./types";
 
-const DEFAULT_OPENAI_FREQUENCY_PENALTY = 0;
-const DEFAULT_OPENAI_MAX_TOKENS = 1000;
 const DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo";
-const DEFAULT_OPENAI_PRESENCE_PENALTY = 0;
-const DEFAULT_OPENAI_TEMPERATURE = 0.7;
-const DEFAULT_OPENAI_TOP_P = 1;
 
 export async function prompt(
   prompts: (string | ChatMessage)[],
