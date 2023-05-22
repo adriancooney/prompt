@@ -158,12 +158,12 @@ try {
 ```ts
 type ChatCompletionOptions = {
   apiKey: string;
-  frequencyPenalty: number;
-  maxTokens: number;
   model: "gpt-3.5-turbo" | "gpt-4";
-  presencePenalty: number;
-  temperature: number;
-  topP: number;
+  frequencyPenalty?: number;
+  maxTokens?: number;
+  presencePenalty?: number;
+  temperature?: number;
+  topP?: number;
 };
 
 type Message = {
@@ -216,6 +216,7 @@ declare class OpenAIError extends Error {
   code: string | null;
   constructor(type: string, code: string | null, message: string);
 }
+
 declare class OpenAIModelOverloadedError extends OpenAIError {}
 
 export {
