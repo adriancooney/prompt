@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.1.2
+
+### Patch Changes
+
+- 1f3df49: Remove sourcemaps
+
 ## 0.1.1
 
 ### Patch Changes
