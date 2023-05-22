@@ -50,7 +50,7 @@ The response object contains the following properties:
 - `prompts` - The input array of messages and the output `ai` message. (`ChatMessage[]`)
 - `timestamp` - The time the completion operation started at. (`number` ms)
 - `duration` - The time it took to complete the operation. (`number` ms)
-- `estimatedTokens` - The amount of tokens the operation used. Useful for calculating cost. It's called `estimatedTokens` because the response from `promptStream` is an estimation (uses same formula as https://platform.openai.com/tokenizer for Chat-based LLM). (`number`)
+- `estimatedTokens` - The amount of tokens the operation used. Exact value when called via `prompt`, an accurate estimate when called via `promptStream`. (`number`)
 
 Sending another message to the chat is a matter of appending the `prompts` returned from previous calls:
 
