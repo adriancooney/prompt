@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.1.3
+
+### Patch Changes
+
+- 876efbe: Fix readme (again)
+
 ## 0.1.2
 
 ### Patch Changes
