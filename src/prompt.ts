@@ -139,23 +139,15 @@ function getChatCompletionOptions(
 ): ChatCompletionOptions {
   return {
     apiKey: options?.apiKey || getOpenAIApiKey(),
-    frequencyPenalty:
-      safeParseNumber(process.env.OPENAI_FREQUENCY_PENALTY) ||
-      DEFAULT_OPENAI_FREQUENCY_PENALTY,
-    maxTokens:
-      safeParseNumber(process.env.OPENAI_MAX_TOKENS) ||
-      DEFAULT_OPENAI_MAX_TOKENS,
     model:
       (process.env.OPENAI_MODEL as
         | ChatCompletionOptions["model"]
         | undefined) || DEFAULT_OPENAI_MODEL,
-    presencePenalty:
-      safeParseNumber(process.env.OPENAI_PRESENCE_PENALTY) ||
-      DEFAULT_OPENAI_PRESENCE_PENALTY,
-    temperature:
-      safeParseNumber(process.env.OPENAI_TEMPERATURE) ||
-      DEFAULT_OPENAI_TEMPERATURE,
-    topP: safeParseNumber(process.env.OPENAI_TOP_P) || DEFAULT_OPENAI_TOP_P,
+    frequencyPenalty: safeParseNumber(process.env.OPENAI_FREQUENCY_PENALTY),
+    maxTokens: safeParseNumber(process.env.OPENAI_MAX_TOKENS),
+    presencePenalty: safeParseNumber(process.env.OPENAI_PRESENCE_PENALTY),
+    temperature: safeParseNumber(process.env.OPENAI_TEMPERATURE),
+    topP: safeParseNumber(process.env.OPENAI_TOP_P),
     ...options,
   };
 }

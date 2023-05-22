@@ -21,11 +21,16 @@ describe("prompt", () => {
       });
 
       const question = "Knock Knock?";
-      const result = await prompt([
-        system("You are a helpful AI assistant."),
-        ai("Good morning, how can I help?"),
-        user(question),
-      ]);
+      const result = await prompt(
+        [
+          system("You are a helpful AI assistant."),
+          ai("Good morning, how can I help?"),
+          user(question),
+        ],
+        {
+          apiKey: "foobar",
+        }
+      );
 
       expect(result).toMatchInlineSnapshot(`
         {
@@ -62,7 +67,9 @@ describe("prompt", () => {
         tokenCount: 3,
       });
 
-      const result = await prompt(["Knock knock?"]);
+      const result = await prompt(["Knock knock?"], {
+        apiKey: "foobar",
+      });
 
       expect(result).toMatchInlineSnapshot(`
         {
@@ -92,7 +99,9 @@ describe("prompt", () => {
         textStream("Hello back!")
       );
 
-      const res = await promptStream([user("Hello world!")]);
+      const res = await promptStream([user("Hello world!")], {
+        apiKey: "foobar",
+      });
 
       expect(await text(res)).toEqual("Hello back!");
     });
@@ -102,6 +111,7 @@ describe("prompt", () => {
 
       const response = await new Promise((resolve, reject) => {
         promptStream([user("Hello world!")], {
+          apiKey: "foobar",
           onComplete: resolve,
         })
           .then(text)
