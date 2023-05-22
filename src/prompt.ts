@@ -11,25 +11,32 @@ import { ChatMessage, PromptResponse } from "./types";
 
 export async function prompt(
   prompts: (string | ChatMessage)[],
-  options: { openAiApiKey?: string } & Partial<ChatCompletionOptions> = {}
+  options: Partial<ChatCompletionOptions> = {}
 ): Promise<PromptResponse> {
+  const timeStart = Date.now();
   const { prompts: castedPrompts, serializedPrompts } = createPrompts(prompts);
   const { output, tokenCount } = await fetchChatCompletion(
     serializedPrompts,
     options
   );
 
-  return await createPromptResponse(options, castedPrompts, output, tokenCount);
+  return await createPromptResponse(
+    options,
+    castedPrompts,
+    output,
+    timeStart,
+    tokenCount
+  );
 }
 
 export async function promptStream(
   prompts: (string | ChatMessage)[],
   options: {
-    openAiApiKey?: string;
     onToken?: (token: string, res: PromptResponse) => void | Promise<void>;
     onComplete?: (res: PromptResponse) => void | Promise<void>;
   } & Partial<ChatCompletionOptions> = {}
 ): Promise<ReadableStream> {
+  const timeStart = Date.now();
   const { prompts: castedPrompts, serializedPrompts } = createPrompts(prompts);
 
   const res = await fetchChatCompletionStream(serializedPrompts, options);
@@ -47,14 +54,24 @@ export async function promptStream(
         if (options.onToken) {
           await options.onToken(
             token,
-            await createPromptResponse(options, castedPrompts, chunks.join(""))
+            await createPromptResponse(
+              options,
+              castedPrompts,
+              chunks.join(""),
+              timeStart
+            )
           );
         }
       },
       async flush() {
         if (options.onComplete) {
           await options.onComplete(
-            await createPromptResponse(options, castedPrompts, chunks.join(""))
+            await createPromptResponse(
+              options,
+              castedPrompts,
+              chunks.join(""),
+              timeStart
+            )
           );
         }
       },
@@ -66,18 +83,20 @@ async function createPromptResponse(
   options: Partial<ChatCompletionOptions>,
   prompts: ChatMessage[],
   output: string,
+  timeStart: number,
   tokenCount?: number
 ): Promise<PromptResponse> {
   const encoder = await getEncoder();
   const { model } = getChatCompletionOptions(options);
-  const timestamp = Date.now();
+  const now = Date.now();
   const allPrompts = prompts.concat(ai(output));
 
   return {
     model,
     output,
     prompts: allPrompts,
-    timestamp,
+    timestamp: timeStart,
+    duration: now - timeStart,
     estimatedTokens:
       tokenCount ?? getChatEstimatedTokenCount(encoder, allPrompts),
   };

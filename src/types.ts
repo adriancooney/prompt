@@ -23,6 +23,7 @@ export type PromptResponse = {
   prompts: ChatMessage[];
   output: string;
   timestamp: number;
+  duration: number;
   estimatedTokens: number;
   model: ChatCompletionOptions["model"];
 };

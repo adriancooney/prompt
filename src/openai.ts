@@ -6,12 +6,12 @@ import {
 import { debug } from "./debug";
 import { OpenAIError, OpenAIModelOverloadedError } from "./errors";
 
-const DEFAULT_OPEN_AI_FREQUENCY_PENALTY = 0;
-const DEFAULT_OPEN_AI_MAX_TOKENS = 1000;
-const DEFAULT_OPEN_AI_MODEL = "gpt-3.5-turbo";
-const DEFAULT_OPEN_AI_PRESENCE_PENALTY = 0;
-const DEFAULT_OPEN_AI_TEMPERATURE = 0.7;
-const DEFAULT_OPEN_AI_TOP_P = 1;
+const DEFAULT_OPENAI_FREQUENCY_PENALTY = 0;
+const DEFAULT_OPENAI_MAX_TOKENS = 1000;
+const DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo";
+const DEFAULT_OPENAI_PRESENCE_PENALTY = 0;
+const DEFAULT_OPENAI_TEMPERATURE = 0.7;
+const DEFAULT_OPENAI_TOP_P = 1;
 
 const SERVER_OVERLOADED_ERROR_MATCHER = /overloaded/i;
 
@@ -189,24 +189,24 @@ export function getChatCompletionOptions(
   options?: Partial<ChatCompletionOptions>
 ): ChatCompletionOptions {
   return {
-    apiKey: getOpenAIApiKey(),
+    apiKey: options?.apiKey || getOpenAIApiKey(),
     frequencyPenalty:
-      safeParseNumber(process.env.OPEN_AI_FREQUENCY_PENALTY) ||
-      DEFAULT_OPEN_AI_FREQUENCY_PENALTY,
+      safeParseNumber(process.env.OPENAI_FREQUENCY_PENALTY) ||
+      DEFAULT_OPENAI_FREQUENCY_PENALTY,
     maxTokens:
-      safeParseNumber(process.env.OPEN_AI_MAX_TOKENS) ||
-      DEFAULT_OPEN_AI_MAX_TOKENS,
+      safeParseNumber(process.env.OPENAI_MAX_TOKENS) ||
+      DEFAULT_OPENAI_MAX_TOKENS,
     model:
-      (process.env.OPEN_AI_MODEL as
+      (process.env.OPENAI_MODEL as
         | ChatCompletionOptions["model"]
-        | undefined) || DEFAULT_OPEN_AI_MODEL,
+        | undefined) || DEFAULT_OPENAI_MODEL,
     presencePenalty:
-      safeParseNumber(process.env.OPEN_AI_PRESENCE_PENALTY) ||
-      DEFAULT_OPEN_AI_PRESENCE_PENALTY,
+      safeParseNumber(process.env.OPENAI_PRESENCE_PENALTY) ||
+      DEFAULT_OPENAI_PRESENCE_PENALTY,
     temperature:
-      safeParseNumber(process.env.OPEN_AI_TEMPERATURE) ||
-      DEFAULT_OPEN_AI_TEMPERATURE,
-    topP: safeParseNumber(process.env.OPEN_AI_TOP_P) || DEFAULT_OPEN_AI_TOP_P,
+      safeParseNumber(process.env.OPENAI_TEMPERATURE) ||
+      DEFAULT_OPENAI_TEMPERATURE,
+    topP: safeParseNumber(process.env.OPENAI_TOP_P) || DEFAULT_OPENAI_TOP_P,
     ...options,
   };
 }
