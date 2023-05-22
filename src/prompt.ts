@@ -4,10 +4,16 @@ import {
   ChatCompletionOptions,
   fetchChatCompletion,
   fetchChatCompletionStream,
-  getChatCompletionOptions,
 } from "./openai";
 import { getChatEstimatedTokenCount, getEncoder } from "./tokens";
 import { ChatMessage, PromptResponse } from "./types";
+
+const DEFAULT_OPENAI_FREQUENCY_PENALTY = 0;
+const DEFAULT_OPENAI_MAX_TOKENS = 1000;
+const DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo";
+const DEFAULT_OPENAI_PRESENCE_PENALTY = 0;
+const DEFAULT_OPENAI_TEMPERATURE = 0.7;
+const DEFAULT_OPENAI_TOP_P = 1;
 
 export async function prompt(
   prompts: (string | ChatMessage)[],
@@ -17,7 +23,7 @@ export async function prompt(
   const { prompts: castedPrompts, serializedPrompts } = createPrompts(prompts);
   const { output, tokenCount } = await fetchChatCompletion(
     serializedPrompts,
-    options
+    getChatCompletionOptions(options)
   );
 
   return await createPromptResponse(
@@ -39,7 +45,11 @@ export async function promptStream(
   const timeStart = Date.now();
   const { prompts: castedPrompts, serializedPrompts } = createPrompts(prompts);
 
-  const res = await fetchChatCompletionStream(serializedPrompts, options);
+  const res = await fetchChatCompletionStream(
+    serializedPrompts,
+    getChatCompletionOptions(options)
+  );
+
   const decoder = new TextDecoder();
   const chunks: string[] = [];
 
@@ -122,4 +132,44 @@ function createPrompts(prompts: (string | ChatMessage)[]): {
     prompts: castedPrompts,
     serializedPrompts,
   };
+}
+
+function getChatCompletionOptions(
+  options?: Partial<ChatCompletionOptions>
+): ChatCompletionOptions {
+  return {
+    apiKey: options?.apiKey || getOpenAIApiKey(),
+    frequencyPenalty:
+      safeParseNumber(process.env.OPENAI_FREQUENCY_PENALTY) ||
+      DEFAULT_OPENAI_FREQUENCY_PENALTY,
+    maxTokens:
+      safeParseNumber(process.env.OPENAI_MAX_TOKENS) ||
+      DEFAULT_OPENAI_MAX_TOKENS,
+    model:
+      (process.env.OPENAI_MODEL as
+        | ChatCompletionOptions["model"]
+        | undefined) || DEFAULT_OPENAI_MODEL,
+    presencePenalty:
+      safeParseNumber(process.env.OPENAI_PRESENCE_PENALTY) ||
+      DEFAULT_OPENAI_PRESENCE_PENALTY,
+    temperature:
+      safeParseNumber(process.env.OPENAI_TEMPERATURE) ||
+      DEFAULT_OPENAI_TEMPERATURE,
+    topP: safeParseNumber(process.env.OPENAI_TOP_P) || DEFAULT_OPENAI_TOP_P,
+    ...options,
+  };
+}
+
+function getOpenAIApiKey(): string {
+  const key = process.env.OPENAI_API_KEY;
+
+  if (!key) {
+    throw new Error(`OPENAI_API_KEY environment variable not set`);
+  }
+
+  return key;
+}
+
+function safeParseNumber(value: string | undefined): number | undefined {
+  return value ? parseInt(value, 10) : undefined;
 }

@@ -1,13 +1,15 @@
 # `prompt`
 
-#### A lightweight interface to OpenAI's Chat-based LLMs
+A lightweight interface to OpenAI's Chat-based LLMs
 
-Features:
+#### Features
 
 - Edge compatible
 - Streaming support (via `ReadableStream`)
   - Includes accurate token count estimation.
   - `onToken` and `onComplete` callbacks.
+
+---
 
 Input your prompts as a series of messages from the 3 possible roles: `system`, `ai` ("assistant") or `user`. `prompt` will read your OpenAI API key from `process.env.OPENAI_API_KEY`.
 

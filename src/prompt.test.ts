@@ -29,7 +29,9 @@ describe("prompt", () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
+          "duration": 0,
           "estimatedTokens": 3,
+          "model": "gpt-3.5-turbo",
           "output": "Who's there?",
           "prompts": [
             {
@@ -64,7 +66,9 @@ describe("prompt", () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
+          "duration": 0,
           "estimatedTokens": 3,
+          "model": "gpt-3.5-turbo",
           "output": "Who's there?",
           "prompts": [
             {
@@ -106,7 +110,9 @@ describe("prompt", () => {
 
       expect(response).toMatchInlineSnapshot(`
         {
+          "duration": 0,
           "estimatedTokens": 16,
+          "model": "gpt-3.5-turbo",
           "output": "Wow",
           "prompts": [
             {

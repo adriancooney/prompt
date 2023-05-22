@@ -6,13 +6,6 @@ import {
 import { debug } from "./debug";
 import { OpenAIError, OpenAIModelOverloadedError } from "./errors";
 
-const DEFAULT_OPENAI_FREQUENCY_PENALTY = 0;
-const DEFAULT_OPENAI_MAX_TOKENS = 1000;
-const DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo";
-const DEFAULT_OPENAI_PRESENCE_PENALTY = 0;
-const DEFAULT_OPENAI_TEMPERATURE = 0.7;
-const DEFAULT_OPENAI_TOP_P = 1;
-
 const SERVER_OVERLOADED_ERROR_MATCHER = /overloaded/i;
 
 export type ChatCompletionMessage = {
@@ -22,17 +15,17 @@ export type ChatCompletionMessage = {
 
 export type ChatCompletionOptions = {
   apiKey: string;
-  frequencyPenalty: number;
-  maxTokens: number;
   model: "gpt-3.5-turbo" | "gpt-4";
-  presencePenalty: number;
-  temperature: number;
-  topP: number;
+  frequencyPenalty?: number;
+  maxTokens?: number;
+  presencePenalty?: number;
+  temperature?: number;
+  topP?: number;
 };
 
 export async function fetchChatCompletion(
   messages: ChatCompletionMessage[],
-  options?: Partial<ChatCompletionOptions>
+  options: ChatCompletionOptions
 ): Promise<{ output: string; tokenCount: number }> {
   const res = await fetchChatCompletionResponse(messages, options);
   const text = await res.text();
@@ -57,7 +50,7 @@ export async function fetchChatCompletion(
 
 export async function fetchChatCompletionStream(
   messages: { role: "user" | "assistant" | "system"; content: string }[],
-  options?: Partial<ChatCompletionOptions>
+  options: ChatCompletionOptions
 ): Promise<ReadableStream> {
   const res = await fetchChatCompletionResponse(messages, options, true);
 
@@ -103,10 +96,10 @@ export async function fetchChatCompletionStream(
 
 async function fetchChatCompletionResponse(
   messages: { role: "user" | "assistant" | "system"; content: string }[],
-  options: Partial<ChatCompletionOptions> = {},
+  options: ChatCompletionOptions,
   stream: boolean = false
 ): Promise<Response> {
-  const { apiKey, ...fullOptions } = getChatCompletionOptions(options);
+  const { apiKey, ...fullOptions } = options;
 
   debug(`>> POST https://api.openai.com/v1/chat/completions`, {
     ...fullOptions,
@@ -173,44 +166,4 @@ async function fetchChatCompletionResponse(
   );
 
   return res;
-}
-
-function getOpenAIApiKey(): string {
-  const key = process.env.OPENAI_API_KEY;
-
-  if (!key) {
-    throw new Error(`OPENAI_API_KEY environment variable not set`);
-  }
-
-  return key;
-}
-
-export function getChatCompletionOptions(
-  options?: Partial<ChatCompletionOptions>
-): ChatCompletionOptions {
-  return {
-    apiKey: options?.apiKey || getOpenAIApiKey(),
-    frequencyPenalty:
-      safeParseNumber(process.env.OPENAI_FREQUENCY_PENALTY) ||
-      DEFAULT_OPENAI_FREQUENCY_PENALTY,
-    maxTokens:
-      safeParseNumber(process.env.OPENAI_MAX_TOKENS) ||
-      DEFAULT_OPENAI_MAX_TOKENS,
-    model:
-      (process.env.OPENAI_MODEL as
-        | ChatCompletionOptions["model"]
-        | undefined) || DEFAULT_OPENAI_MODEL,
-    presencePenalty:
-      safeParseNumber(process.env.OPENAI_PRESENCE_PENALTY) ||
-      DEFAULT_OPENAI_PRESENCE_PENALTY,
-    temperature:
-      safeParseNumber(process.env.OPENAI_TEMPERATURE) ||
-      DEFAULT_OPENAI_TEMPERATURE,
-    topP: safeParseNumber(process.env.OPENAI_TOP_P) || DEFAULT_OPENAI_TOP_P,
-    ...options,
-  };
-}
-
-function safeParseNumber(value: string | undefined): number | undefined {
-  return value ? parseInt(value, 10) : undefined;
 }

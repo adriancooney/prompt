@@ -1,21 +1,5 @@
 export async function text(stream: ReadableStream): Promise<string> {
-  const reader = stream.getReader();
-  const decoder = new TextDecoder();
-  const chunks = [];
-
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-
-      chunks.push(decoder.decode(value));
-
-      if (done) {
-        return chunks.join("");
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
+  return new Response(stream).text();
 }
 
 export function textStream(content: string): ReadableStream {
