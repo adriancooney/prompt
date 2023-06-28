@@ -1,11 +1,5 @@
 # @adriancooney/prompt
 
-## 0.2.0
-
-### Minor Changes
-
-- 62a2a15: Add gpt-3.5-turbo-16k
-
 ## 0.1.3
 
 ### Patch Changes
