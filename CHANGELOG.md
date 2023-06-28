@@ -1,5 +1,11 @@
 # @adriancooney/prompt
 
+## 0.1.4
+
+### Patch Changes
+
+- aa9e4c5: Add gpt-3.5-turbo-16k
+
 ## 0.1.3
 
 ### Patch Changes
