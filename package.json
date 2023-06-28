@@ -1,6 +1,6 @@
 {
   "name": "@adriancooney/prompt",
-  "version": "0.2.0",
+  "version": "0.1.3",
   "description": "A lightweight interface to OpenAI's Chat-based LLMs",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
